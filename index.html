@@ -3,34 +3,84 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Under Construction</title>
+    <title>Lucas Anderson Audio</title>
     <style>
         body {
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
+            min-height: 100vh;
+            margin: 0;
             background-color: #f4f4f4;
-            font-family: Arial, sans-serif;
-            text-align: center;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
         }
         .container {
-            padding: 20px;
+            max-width: 800px;
+            padding: 40px;
             background: white;
-            border-radius: 10px;
-            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 20px;
+            box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            margin: 20px;
         }
         h1 {
             color: #333;
+            font-size: 2.5em;
+            margin-bottom: 20px;
+        }
+        .subtitle {
+            color: #666;
+            font-size: 1.2em;
+            margin-bottom: 30px;
+        }
+        .profile-img {
+            width: 100%;
+            max-width: 600px;
+            border-radius: 15px;
+            margin: 30px 0;
+            box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease;
+        }
+        .profile-img:hover {
+            transform: scale(1.02);
+        }
+        .portfolio-link {
+            display: inline-block;
+            padding: 15px 30px;
+            background-color: #333;
+            color: white;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+        }
+        .portfolio-link:hover {
+            background-color: #555;
+            transform: translateY(-2px);
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+        }
+        .description {
+            max-width: 600px;
+            margin: 0 auto 30px;
+            color: #555;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>🚧 🚧 🚧 🚧</h1>
-        <p>Check back soon for updates!</p>
+        <h1>Lucas Anderson Audio</h1>
+        <p class="subtitle">Audio Engineer | Producer | Sound Designer</p>
+        
+        <p class="description">
+            Specializing in professional audio production, podcast engineering, and creative sound design. 
+            With a passion for crafting immersive sonic experiences and delivering exceptional audio quality.
+        </p>
 
-        <img src="./images/drums_diffusion_wood.jpeg" alt="drums diffusion wood" style="width: 100%; max-width: 600px; margin-top: 20px;">
+        <img src="./images/lucas.jpeg" alt="Lucas Anderson" class="profile-img">
+        
+        <a href="portfolio.html" class="portfolio-link">View My Work →</a>
     </div>
 </body>
 </html>
