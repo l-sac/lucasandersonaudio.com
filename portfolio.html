@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lucas Anderson - Portfolio</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+
+        .portfolio-section {
+            margin: 40px 0;
+        }
+
+        .section-title {
+            font-size: 2em;
+            color: #333;
+            border-bottom: 2px solid #333;
+            padding-bottom: 10px;
+            margin-bottom: 30px;
+        }
+
+        .media-container {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .media-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 20px;
+        }
+
+        iframe {
+            border-radius: 12px;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+
+        .back-home {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #333;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+
+        .back-home:hover {
+            background-color: #555;
+        }
+    </style>
+</head>
+<body>
+    <a href="index.html" class="back-home">← Back to Home</a>
+
+    <div class="portfolio-section">
+        <h1 class="section-title">Featured Work</h1>
+        
+        <div class="media-container">
+            <h2>YouTube Content</h2>
+            <iframe width="100%" height="450" src="https://www.youtube.com/embed/6Ql-7NdnAKM" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </div>
+
+        <div class="media-container">
+            <h2>Music Production</h2>
+            <div class="media-grid">
+                <iframe allow="autoplay *; encrypted-media *;" frameborder="0" height="450" style="width:100%;max-width:660px;overflow:hidden;background:transparent;" sandbox="allow-forms allow-popups allow-same-origin allow-scripts allow-storage-access-by-user-activation allow-top-navigation-by-user-activation" src="https://embed.music.apple.com/us/album/shine/1570024217"></iframe>
+                
+                <iframe allow="autoplay *; encrypted-media *;" frameborder="0" height="450" style="width:100%;max-width:660px;overflow:hidden;background:transparent;" sandbox="allow-forms allow-popups allow-same-origin allow-scripts allow-storage-access-by-user-activation allow-top-navigation-by-user-activation" src="https://embed.music.apple.com/us/album/shine/1570024217"></iframe>
+            </div>
+        </div>
+
+        <div class="media-container">
+            <h2>Podcast Work</h2>
+            <div class="media-grid">
+                <iframe style="border-radius:12px" src="https://open.spotify.com/embed/show/0DC28FXHDo3yvNSsXGWebs?utm_source=generator" width="100%" height="352" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+                
+                <iframe style="border-radius:12px" src="https://open.spotify.com/embed/show/00lLRAGr0ntSP92sgLntcU?utm_source=generator" width="100%" height="352" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
