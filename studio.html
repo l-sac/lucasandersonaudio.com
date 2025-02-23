@@ -120,20 +120,26 @@
     </div>
 
     <script>
-        // Function to load images from the /images/studio directory
-        async function loadGalleryImages() {
+        function loadGalleryImages() {
             const gallery = document.querySelector('.gallery');
             
-            // List of image files in your /images/studio directory
-            const images = await fetch('/images/studio')
-                .then(response => response.text())
-                .then(text => {
-                    const parser = new DOMParser();
-                    const doc = parser.parseFromString(text, 'text/html');
-                    return Array.from(doc.querySelectorAll('a'))
-                        .map(a => a.href)
-                        .filter(href => href.match(/\.(jpg|jpeg|png|gif)$/i));
-                });
+            const images = [
+                './images/studio/booth_1.jpeg',
+                './images/studio/booth_2.jpeg',
+                './images/studio/control_room_1.jpeg',
+                './images/studio/control_room_2.jpeg',
+                './images/studio/control_room_3.jpeg',
+                './images/studio/control_room_4.jpeg',
+                './images/studio/control_room_5.jpeg',
+                './images/studio/live_room_1.jpeg',
+                './images/studio/live_room_2.jpeg',
+                './images/studio/live_room_3.jpeg',
+                './images/studio/live_room_4.jpeg',
+                './images/studio/live_room_5.jpeg',
+                './images/studio/personal_mixer.jpeg',
+                './images/studio/rack_1.jpeg',
+                './images/studio/rack_2.jpeg'
+            ];
 
             images.forEach(imagePath => {
                 const item = document.createElement('div');
