@@ -106,9 +106,6 @@
             Specializing in professional audio production, podcast engineering, and creative sound design. 
             With a passion for crafting immersive sonic experiences and delivering exceptional audio quality.
         </p>
-
-        <img src="./images/home_page/drums_diffusion_wood.jpeg" alt="drums diffusion wood" class="profile-img">
-        
         <div class="game-container">
             <canvas id="pongCanvas" width="600" height="400"></canvas>
             <p class="game-instructions">Use W/S keys for left paddle, Up/Down arrows for right paddle</p>
@@ -249,23 +246,22 @@
             ball.dy = (Math.random() * 2 - 1) * ball.speed;
         }
 
-        // Improved music note drawing function
+        // Improved quarter note drawing function
         function drawMusicNote(x, y, radius) {
             ctx.beginPath();
             ctx.fillStyle = '#fff';
             
-            // Draw note head (slightly oval)
+            // Draw note head (solid oval)
             ctx.save();
             ctx.translate(x, y);
-            ctx.rotate(-0.2); // Slight tilt for style
-            ctx.scale(1, 1.5); // Make it more oval
+            ctx.scale(1, 0.75); // Make it more oval
             ctx.arc(0, 0, radius, 0, Math.PI * 2);
+            ctx.fill();
             ctx.restore();
             
-            // Draw stem
-            ctx.fillRect(x + radius - 2, y - radius * 2.5, 2, radius * 2.5);
+            // Draw stem (taller and slightly thicker)
+            ctx.fillRect(x + radius - 1, y - radius * 3, 3, radius * 3);
             
-            ctx.fill();
             ctx.closePath();
         }
 
@@ -314,7 +310,7 @@
             ctx.fillStyle = '#000';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            // Draw middle line (like a timeline)
+            // Draw middle line
             ctx.setLineDash([5, 15]);
             ctx.beginPath();
             ctx.moveTo(canvas.width / 2, 0);
@@ -323,9 +319,12 @@
             ctx.stroke();
             ctx.setLineDash([]);
 
-            // Draw paddles as faders
-            drawFader(leftPaddle.x, leftPaddle.y, leftPaddle.width, leftPaddle.height);
-            drawFader(rightPaddle.x, rightPaddle.y, rightPaddle.width, rightPaddle.height);
+            // Draw paddles with colors
+            ctx.fillStyle = '#ff4444'; // Red for left paddle
+            ctx.fillRect(leftPaddle.x, leftPaddle.y, leftPaddle.width, leftPaddle.height);
+            
+            ctx.fillStyle = '#44ff44'; // Green for right paddle
+            ctx.fillRect(rightPaddle.x, rightPaddle.y, rightPaddle.width, rightPaddle.height);
 
             // Draw ball as music note
             drawMusicNote(ball.x, ball.y, ball.radius);
@@ -337,10 +336,89 @@
             ctx.fillText(rightPaddle.score, 3 * canvas.width / 4, 50);
         }
 
+        // Add victory animation
+        function createConfetti() {
+            return {
+                x: Math.random() * canvas.width,
+                y: -20,
+                size: Math.random() * 6 + 4,
+                speed: Math.random() * 3 + 2,
+                angle: Math.random() * Math.PI * 2,
+                rotation: Math.random() * 0.2 - 0.1,
+                color: `hsl(${Math.random() * 360}, 70%, 50%)`
+            };
+        }
+
+        let confetti = [];
+        let isVictoryAnimating = false;
+        let drumImage = new Image();
+        drumImage.src = './images/home_page/drums_diffusion_wood.jpeg'; 
+
+        function playVictoryAnimation(winner) {
+            isVictoryAnimating = true;
+            confetti = Array(100).fill().map(createConfetti);
+            
+            // Reset game after animation
+            setTimeout(() => {
+                isVictoryAnimating = false;
+                leftPaddle.score = 0;
+                rightPaddle.score = 0;
+                resetBall();
+            }, 3000);
+        }
+
+        function updateVictoryAnimation() {
+            if (!isVictoryAnimating) return;
+
+            // Clear canvas
+            ctx.fillStyle = '#000';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Draw drum image in center
+            const drumSize = 200;
+            ctx.drawImage(
+                drumImage, 
+                canvas.width/2 - drumSize/2, 
+                canvas.height/2 - drumSize/2,
+                drumSize,
+                drumSize
+            );
+
+            // Animate confetti
+            confetti.forEach(c => {
+                c.y += c.speed;
+                c.angle += c.rotation;
+
+                ctx.fillStyle = c.color;
+                ctx.beginPath();
+                ctx.save();
+                ctx.translate(c.x, c.y);
+                ctx.rotate(c.angle);
+                ctx.fillRect(-c.size/2, -c.size/2, c.size, c.size);
+                ctx.restore();
+                ctx.closePath();
+
+                // Reset confetti when it goes off screen
+                if (c.y > canvas.height) {
+                    c.y = -20;
+                    c.x = Math.random() * canvas.width;
+                }
+            });
+        }
+
         function gameLoop() {
-            movePaddles();
-            moveBall();
-            draw();
+            if (isVictoryAnimating) {
+                updateVictoryAnimation();
+            } else {
+                movePaddles();
+                moveBall();
+                draw();
+
+                // Check for victory
+                if (leftPaddle.score >= 5 || rightPaddle.score >= 5) {
+                    playVictoryAnimation(leftPaddle.score >= 5 ? 'left' : 'right');
+                }
+            }
             requestAnimationFrame(gameLoop);
         }
 
