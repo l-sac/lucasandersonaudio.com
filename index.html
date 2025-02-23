@@ -122,9 +122,19 @@
     </div>
 
     <script>
-        // Pong Game Logic
+        // Prevent arrow key scrolling
+        window.addEventListener("keydown", function(e) {
+            if([" ", "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].indexOf(e.code) > -1) {
+                e.preventDefault();
+            }
+        }, false);
+
         const canvas = document.getElementById('pongCanvas');
         const ctx = canvas.getContext('2d');
+
+        // Add audio elements
+        const hitSound = new Audio('data:audio/wav;base64,UklGRjIAAABXQVZFZm10IBIAAAABAAEAQB8AAEAfAAABAAgAAABmYWN0BAAAAAAAAABkYXRhAAAAAA==');
+        const scoreSound = new Audio('data:audio/wav;base64,UklGRjIAAABXQVZFZm10IBIAAAABAAEAQB8AAEAfAAABAAgAAABmYWN0BAAAAAAAAABkYXRhAAAAAA==');
 
         // Game objects
         const ball = {
@@ -199,9 +209,10 @@
             ball.x += ball.dx;
             ball.y += ball.dy;
 
-            // Wall collision (top and bottom)
+            // Wall collision
             if (ball.y + ball.radius > canvas.height || ball.y - ball.radius < 0) {
                 ball.dy *= -1;
+                hitSound.play().catch(e => {});
             }
 
             // Paddle collision
@@ -212,8 +223,8 @@
                     ball.y + ball.radius > paddle.y &&
                     ball.y - ball.radius < paddle.y + paddle.height) {
                     ball.dx *= -1;
+                    hitSound.play().catch(e => {});
                     
-                    // Add some randomness to the ball angle
                     const hitPos = (ball.y - (paddle.y + paddle.height/2)) / (paddle.height/2);
                     ball.dy = hitPos * ball.speed;
                 }
@@ -222,9 +233,11 @@
             // Score points
             if (ball.x + ball.radius > canvas.width) {
                 leftPaddle.score++;
+                scoreSound.play().catch(e => {});
                 resetBall();
             } else if (ball.x - ball.radius < 0) {
                 rightPaddle.score++;
+                scoreSound.play().catch(e => {});
                 resetBall();
             }
         }
@@ -236,12 +249,55 @@
             ball.dy = (Math.random() * 2 - 1) * ball.speed;
         }
 
+        // Customize ball to look like a music note
+        function drawMusicNote(x, y, radius) {
+            ctx.beginPath();
+            ctx.fillStyle = '#fff';
+            // Draw note head
+            ctx.arc(x, y, radius, 0, Math.PI * 2);
+            // Draw note stem
+            ctx.fillRect(x + radius - 2, y - radius, 2, -radius * 2);
+            ctx.fill();
+            ctx.closePath();
+        }
+
+        // Customize paddles to look like faders
+        function drawFader(x, y, width, height) {
+            ctx.fillStyle = '#666';
+            ctx.fillRect(x - 2, y - 10, width + 4, height + 20);
+            ctx.fillStyle = '#fff';
+            ctx.fillRect(x, y, width, height);
+        }
+
+        // Add visual elements
+        const visualizer = {
+            bars: Array(20).fill(0),
+            update() {
+                this.bars = this.bars.map(() => Math.random() * 30);
+            },
+            draw() {
+                ctx.fillStyle = '#333';
+                this.bars.forEach((height, i) => {
+                    ctx.fillRect(
+                        i * (canvas.width / this.bars.length),
+                        canvas.height - height,
+                        canvas.width / this.bars.length - 2,
+                        height
+                    );
+                });
+            }
+        };
+
         function draw() {
             // Clear canvas
             ctx.fillStyle = '#000';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            // Draw middle line
+            // Draw visualizer
+            visualizer.update();
+            visualizer.draw();
+
+            // Draw middle line (like a timeline)
             ctx.setLineDash([5, 15]);
             ctx.beginPath();
             ctx.moveTo(canvas.width / 2, 0);
@@ -250,20 +306,16 @@
             ctx.stroke();
             ctx.setLineDash([]);
 
-            // Draw paddles
-            ctx.fillStyle = '#fff';
-            ctx.fillRect(leftPaddle.x, leftPaddle.y, leftPaddle.width, leftPaddle.height);
-            ctx.fillRect(rightPaddle.x, rightPaddle.y, rightPaddle.width, rightPaddle.height);
+            // Draw paddles as faders
+            drawFader(leftPaddle.x, leftPaddle.y, leftPaddle.width, leftPaddle.height);
+            drawFader(rightPaddle.x, rightPaddle.y, rightPaddle.width, rightPaddle.height);
 
-            // Draw ball
-            ctx.beginPath();
-            ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
-            ctx.fillStyle = '#fff';
-            ctx.fill();
-            ctx.closePath();
+            // Draw ball as music note
+            drawMusicNote(ball.x, ball.y, ball.radius);
 
             // Draw scores
             ctx.font = '32px Arial';
+            ctx.fillStyle = '#fff';
             ctx.fillText(leftPaddle.score, canvas.width / 4, 50);
             ctx.fillText(rightPaddle.score, 3 * canvas.width / 4, 50);
         }
