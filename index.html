@@ -77,23 +77,49 @@
             justify-content: center;
             margin-top: 20px;
         }
+        .game-container {
+            position: relative;
+            margin: 30px 0;
+            text-align: center;
+        }
         #pongCanvas {
             border-radius: 10px;
             margin: 20px auto;
             background: #000;
             display: block;
             box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.2);
+            touch-action: none; /* Prevents default touch actions */
         }
-
-        .game-container {
-            margin: 30px 0;
-            text-align: center;
+        .touch-control {
+            position: absolute;
+            width: 50%;
+            height: 100%;
+            top: 0;
+            opacity: 0;
         }
-
-        .game-instructions {
-            color: #666;
-            margin: 10px 0;
-            font-size: 0.9em;
+        .touch-left {
+            left: 0;
+        }
+        .touch-right {
+            right: 0;
+        }
+        .mobile-instructions {
+            display: none;
+        }
+        @media (max-width: 768px) {
+            #pongCanvas {
+                width: 100%;
+                height: auto;
+            }
+            .game-instructions {
+                display: none;
+            }
+            .mobile-instructions {
+                display: block;
+                color: #666;
+                margin: 10px 0;
+                font-size: 0.9em;
+            }
         }
     </style>
 </head>
@@ -108,7 +134,10 @@
         </p>
         <div class="game-container">
             <canvas id="pongCanvas" width="600" height="400"></canvas>
+            <div class="touch-control touch-left"></div>
+            <div class="touch-control touch-right"></div>
             <p class="game-instructions">Use W/S keys for left paddle, Up/Down arrows for right paddle</p>
+            <p class="mobile-instructions">Touch and drag on either side to move the paddles</p>
         </div>
         
         <div class="button-container">
@@ -184,21 +213,59 @@
             }
         });
 
-        function movePaddles() {
-            // Left paddle
-            if (keys.w && leftPaddle.y > 0) {
-                leftPaddle.y -= leftPaddle.dy;
-            }
-            if (keys.s && leftPaddle.y < canvas.height - leftPaddle.height) {
-                leftPaddle.y += leftPaddle.dy;
+        // Touch control variables
+        let leftTouchY = null;
+        let rightTouchY = null;
+
+        // Add touch event listeners
+        const touchLeft = document.querySelector('.touch-left');
+        const touchRight = document.querySelector('.touch-right');
+
+        function handleTouch(e, side) {
+            e.preventDefault();
+            const touch = e.touches[0];
+            const rect = canvas.getBoundingClientRect();
+            const scaleY = canvas.height / rect.height;
+            const touchY = (touch.clientY - rect.top) * scaleY;
+            
+            if (side === 'left') {
+                leftPaddle.y = touchY - (leftPaddle.height / 2);
+            } else {
+                rightPaddle.y = touchY - (rightPaddle.height / 2);
             }
 
-            // Right paddle
-            if (keys.ArrowUp && rightPaddle.y > 0) {
-                rightPaddle.y -= rightPaddle.dy;
+            // Keep paddles within canvas bounds
+            if (side === 'left') {
+                leftPaddle.y = Math.max(0, Math.min(canvas.height - leftPaddle.height, leftPaddle.y));
+            } else {
+                rightPaddle.y = Math.max(0, Math.min(canvas.height - rightPaddle.height, rightPaddle.y));
             }
-            if (keys.ArrowDown && rightPaddle.y < canvas.height - rightPaddle.height) {
-                rightPaddle.y += rightPaddle.dy;
+        }
+
+        touchLeft.addEventListener('touchstart', (e) => handleTouch(e, 'left'));
+        touchLeft.addEventListener('touchmove', (e) => handleTouch(e, 'left'));
+        touchRight.addEventListener('touchstart', (e) => handleTouch(e, 'right'));
+        touchRight.addEventListener('touchmove', (e) => handleTouch(e, 'right'));
+
+        // Update movePaddles function to work with both keyboard and touch
+        function movePaddles() {
+            // Only use keyboard controls if no touch is active
+            if (leftTouchY === null) {
+                if (keys.w && leftPaddle.y > 0) {
+                    leftPaddle.y -= leftPaddle.dy;
+                }
+                if (keys.s && leftPaddle.y < canvas.height - leftPaddle.height) {
+                    leftPaddle.y += leftPaddle.dy;
+                }
+            }
+
+            if (rightTouchY === null) {
+                if (keys.ArrowUp && rightPaddle.y > 0) {
+                    rightPaddle.y -= rightPaddle.dy;
+                }
+                if (keys.ArrowDown && rightPaddle.y < canvas.height - rightPaddle.height) {
+                    rightPaddle.y += rightPaddle.dy;
+                }
             }
         }
 
@@ -424,6 +491,25 @@
 
         // Start the game
         gameLoop();
+
+        // Make canvas responsive
+        function resizeCanvas() {
+            const container = canvas.parentElement;
+            const maxWidth = container.clientWidth;
+            const scale = maxWidth / 600;
+            
+            if (scale < 1) {
+                canvas.style.width = `${600 * scale}px`;
+                canvas.style.height = `${400 * scale}px`;
+            } else {
+                canvas.style.width = '600px';
+                canvas.style.height = '400px';
+            }
+        }
+
+        // Call resize on page load and window resize
+        window.addEventListener('load', resizeCanvas);
+        window.addEventListener('resize', resizeCanvas);
     </script>
 </body>
 </html>
