@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Studio Gallery - Lucas Anderson Audio</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+        }
+
+        .header {
+            text-align: center;
+            padding: 20px;
+            margin-bottom: 40px;
+        }
+
+        .nav-link {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #333;
+            color: white;
+            text-decoration: none;
+            border-radius: 50px;
+            margin-bottom: 30px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover {
+            background-color: #555;
+            transform: translateY(-2px);
+        }
+
+        .gallery {
+            columns: 3 300px;
+            column-gap: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .gallery-item {
+            break-inside: avoid;
+            margin-bottom: 20px;
+            position: relative;
+            border-radius: 15px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .gallery-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+
+        .gallery-item img {
+            width: 100%;
+            height: auto;
+            display: block;
+            border-radius: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .gallery-item:hover img {
+            filter: brightness(1.1);
+        }
+
+        /* Lightbox styles */
+        .lightbox {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.9);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .lightbox img {
+            max-width: 90%;
+            max-height: 90vh;
+            border-radius: 10px;
+        }
+
+        .close-lightbox {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            color: white;
+            font-size: 30px;
+            cursor: pointer;
+            padding: 10px;
+        }
+
+        @media (max-width: 600px) {
+            .gallery {
+                columns: 2 200px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <a href="index.html" class="nav-link">← Back to Home</a>
+        <h1>Studio Gallery</h1>
+    </div>
+
+    <div class="gallery">
+        <!-- Images will be dynamically added here using JavaScript -->
+    </div>
+
+    <div class="lightbox" onclick="closeLightbox()">
+        <span class="close-lightbox">×</span>
+        <img src="" alt="Enlarged studio image">
+    </div>
+
+    <script>
+        // Function to load images from the /images/studio directory
+        async function loadGalleryImages() {
+            const gallery = document.querySelector('.gallery');
+            
+            // List of image files in your /images/studio directory
+            const images = await fetch('/images/studio')
+                .then(response => response.text())
+                .then(text => {
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(text, 'text/html');
+                    return Array.from(doc.querySelectorAll('a'))
+                        .map(a => a.href)
+                        .filter(href => href.match(/\.(jpg|jpeg|png|gif)$/i));
+                });
+
+            images.forEach(imagePath => {
+                const item = document.createElement('div');
+                item.className = 'gallery-item';
+                
+                const img = document.createElement('img');
+                img.src = imagePath;
+                img.alt = 'Studio Image';
+                img.loading = 'lazy';
+                
+                img.onclick = () => openLightbox(imagePath);
+                
+                item.appendChild(img);
+                gallery.appendChild(item);
+            });
+        }
+
+        // Lightbox functions
+        function openLightbox(imageSrc) {
+            const lightbox = document.querySelector('.lightbox');
+            const lightboxImg = lightbox.querySelector('img');
+            lightboxImg.src = imageSrc;
+            lightbox.style.display = 'flex';
+        }
+
+        function closeLightbox() {
+            document.querySelector('.lightbox').style.display = 'none';
+        }
+
+        // Load images when the page loads
+        window.addEventListener('load', loadGalleryImages);
+    </script>
+</body>
+</html>
