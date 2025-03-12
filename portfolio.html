@@ -108,6 +108,39 @@
             opacity: 1;
             transform: scale(1.3) rotate(360deg);
         }
+
+        .music-container {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .note-animation {
+            position: absolute;
+            width: 24px;
+            height: 24px;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23fc3c44"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>') no-repeat center;
+        }
+
+        .music-container:hover .note-animation,
+        .podcast-container:hover .headphone-animation,
+        .youtube-container:hover .play-animation {
+            opacity: 1;
+        }
+
+        .podcast-container, .youtube-container {
+            overflow: hidden;
+        }
+
+        .headphone-animation, .play-animation {
+            pointer-events: none;
+        }
     </style>
 </head>
 <body>
@@ -123,7 +156,7 @@
                 
                 <iframe allow="autoplay *; encrypted-media *;" frameborder="0" height="450" style="width:100%;max-width:660px;overflow:hidden;background:transparent;" sandbox="allow-forms allow-popups allow-same-origin allow-scripts allow-storage-access-by-user-activation allow-top-navigation-by-user-activation" src="https://embed.music.apple.com/us/album/shine/1570024217"></iframe>
 
-                <iframe allow="autoplay *; encrypted-media *;" frameborder="0" height="450" style="width:100%;max-width:660px;overflow:hidden;background:transparent;" sandbox="allow-forms allow-popups allow-same-origin allow-scripts allow-storage-access-by-user-activation allow-top-navigation-by-user-activation" src="https://embed.music.apple.com/us/artist/oxford-clark/1498569336"></iframe>
+                <iframe allow="autoplay *; encrypted-media *;" frameborder="0" height="450" style="width:100%;max-width:660px;overflow:hidden;background:transparent;" sandbox="allow-forms allow-popups allow-same-origin allow-scripts allow-storage-access-by-user-activation allow-top-navigation-by-user-activation" src="https://embed.music.apple.com/us/album/country-roots-with-steve-hennig/1498645327"></iframe>
 
                 <iframe width="100%" height="300" scrolling="no" frameborder="no" allow="autoplay" src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/297422032&color=%23ff5500&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true&visual=true"></iframe>
             </div>
@@ -154,5 +187,55 @@
             </div>
         </div>
     </div>
+
+    <script>
+        function handleMouseMove(e, container, elements, options = {}) {
+            const rect = container.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+
+            elements.forEach((el, index) => {
+                let offsetX = Math.sin((Date.now() + index * 500) / 1000) * 20;
+                let offsetY = Math.cos((Date.now() + index * 500) / 1000) * 20;
+                
+                el.style.transform = `translate(
+                    ${x + offsetX - el.offsetWidth/2}px, 
+                    ${y + offsetY - el.offsetHeight/2}px) 
+                    ${options.rotate ? 'rotate(' + (Math.sin((Date.now() + index * 500) / 1000) * 30) + 'deg)' : ''}
+                    ${options.scale ? 'scale(' + (1 + Math.sin((Date.now() + index * 500) / 1000) * 0.2) + ')' : ''}`;
+            });
+
+            requestAnimationFrame(() => handleMouseMove(e, container, elements, options));
+        }
+
+        document.querySelectorAll('.media-grid > iframe').forEach(iframe => {
+            const container = document.createElement('div');
+            container.className = 'music-container';
+            const note1 = document.createElement('div');
+            const note2 = document.createElement('div');
+            note1.className = note2.className = 'note-animation';
+            iframe.parentNode.insertBefore(container, iframe);
+            container.appendChild(note1);
+            container.appendChild(note2);
+            container.appendChild(iframe);
+
+            container.addEventListener('mousemove', (e) => {
+                handleMouseMove(e, container, [note1, note2], {rotate: true, scale: true});
+            });
+        });
+
+        document.querySelectorAll('.podcast-container').forEach(container => {
+            const headphones = container.querySelectorAll('.headphone-animation');
+            container.addEventListener('mousemove', (e) => {
+                handleMouseMove(e, container, Array.from(headphones), {rotate: true});
+            });
+        });
+
+        const youtubeContainer = document.querySelector('.youtube-container');
+        const playButton = youtubeContainer.querySelector('.play-animation');
+        youtubeContainer.addEventListener('mousemove', (e) => {
+            handleMouseMove(e, youtubeContainer, [playButton], {scale: true, rotate: true});
+        });
+    </script>
 </body>
 </html>
