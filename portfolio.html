@@ -59,6 +59,55 @@
         .back-home:hover {
             background-color: #555;
         }
+
+        .podcast-container {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+        }
+
+        .headphone-animation {
+            position: absolute;
+            width: 28px;
+            height: 28px;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%231DB954"><path d="M12 1a9 9 0 0 0-9 9v7c0 1.66 1.34 3 3 3h3v-8H5v-2c0-3.87 3.13-7 7-7s7 3.13 7 7v2h-4v8h3c1.66 0 3-1.34 3-3v-7a9 9 0 0 0-9-9z"/></svg>') no-repeat center;
+            opacity: 0;
+            transition: all 0.4s ease;
+        }
+
+        .podcast-container:hover .headphone-left {
+            opacity: 1;
+            transform: translate(-90px, 0) rotate(-20deg);
+        }
+
+        .podcast-container:hover .headphone-right {
+            opacity: 1;
+            transform: translate(90px, 0) rotate(20deg);
+        }
+
+        .youtube-container {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+        }
+
+        .play-animation {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23FF0000"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"/></svg>') no-repeat center;
+            opacity: 0;
+            transition: all 0.5s ease;
+        }
+
+        .youtube-container:hover .play-button {
+            opacity: 1;
+            transform: scale(1.3) rotate(360deg);
+        }
     </style>
 </head>
 <body>
@@ -83,15 +132,26 @@
         <div class="media-container">
             <h2>Podcast Work</h2>
             <div class="media-grid">
-                <iframe style="border-radius:12px" src="https://open.spotify.com/embed/show/0DC28FXHDo3yvNSsXGWebs?utm_source=generator" width="100%" height="352" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+                <div class="podcast-container">
+                    <div class="headphone-animation headphone-left"></div>
+                    <div class="headphone-animation headphone-right"></div>
+                    <iframe style="border-radius:12px" src="https://open.spotify.com/embed/show/0DC28FXHDo3yvNSsXGWebs?utm_source=generator" width="100%" height="352" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+                </div>
                 
-                <iframe style="border-radius:12px" src="https://open.spotify.com/embed/show/00lLRAGr0ntSP92sgLntcU?utm_source=generator" width="100%" height="352" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+                <div class="podcast-container">
+                    <div class="headphone-animation headphone-left"></div>
+                    <div class="headphone-animation headphone-right"></div>
+                    <iframe style="border-radius:12px" src="https://open.spotify.com/embed/show/00lLRAGr0ntSP92sgLntcU?utm_source=generator" width="100%" height="352" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+                </div>
             </div>
         </div>
 
         <div class="media-container">
             <h2>YouTube Content</h2>
-            <iframe width="100%" height="450" src="https://www.youtube.com/embed/6Ql-7NdnAKM" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            <div class="youtube-container">
+                <div class="play-animation play-button"></div>
+                <iframe width="100%" height="450" src="https://www.youtube.com/embed/6Ql-7NdnAKM" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            </div>
         </div>
     </div>
 </body>
