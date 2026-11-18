@@ -51,6 +51,7 @@
         }
 
         input, textarea {
+            box-sizing: border-box;
             width: 100%;
             padding: 10px;
             border: 2px solid #ddd;
@@ -84,7 +85,12 @@
             width: auto;
         }
 
-        .submit-btn:hover {
+        .submit-btn:disabled {
+            opacity: 0.65;
+            cursor: wait;
+        }
+
+        .submit-btn:hover:enabled {
             background-color: #555;
             transform: translateY(-2px);
             box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
@@ -112,38 +118,96 @@
         <a href="index.html" class="nav-link">← Back to Home</a>
         <h1>Contact Me</h1>
         
-        <form class="contact-form" action="https://formsubmit.co/Lucas@LucasAndersonAudio.com" method="POST">
+        <form class="contact-form" id="contact-form" action="https://api.web3forms.com/submit" method="POST" hidden>
+            <!-- Set the public Web3Forms access key after enabling hCaptcha in Block Spam. -->
+            <input type="hidden" name="access_key" value="5d09ad85-e0af-4e15-be87-2d21f01471fc">
+            <input type="checkbox" name="botcheck" tabindex="-1" autocomplete="off" hidden>
+
             <div class="form-group">
                 <label for="name">Name:</label>
-                <input type="text" id="name" name="name" required>
+                <input type="text" id="name" name="name" autocomplete="name" maxlength="100" required>
             </div>
 
             <div class="form-group">
                 <label for="email">Email:</label>
-                <input type="email" id="email" name="email" required>
+                <input type="email" id="email" name="email" autocomplete="email" maxlength="254" required>
             </div>
 
             <div class="form-group">
                 <label for="subject">Subject:</label>
-                <input type="text" id="subject" name="_subject" required>
+                <input type="text" id="subject" name="subject" maxlength="200" required>
             </div>
 
             <div class="form-group">
                 <label for="message">Message:</label>
-                <textarea id="message" name="message" required></textarea>
+                <textarea id="message" name="message" maxlength="10000" required></textarea>
             </div>
 
-            <!-- Honeypot to prevent spam -->
-            <input type="text" name="_honey" style="display:none">
-            
-            <!-- Disable Captcha -->
-            <input type="hidden" name="_captcha" value="false">
-
-            <!-- Redirect after submission -->
-            <input type="hidden" name="_next" value="https://lucasandersonaudio.com/thank-you.html">
-
+            <div class="h-captcha" data-sitekey="50b2fe65-b00b-4b9e-ad62-3ba471098be2"
+                 data-size="compact" data-error-callback="verificationUnavailable"></div>
             <button type="submit" class="submit-btn">Send Message</button>
         </form>
+        <p id="form-status" role="status"></p>
+        <noscript>Enable JavaScript to use the verification checkbox and send a message.</noscript>
     </div>
+    <script>
+        const form = document.getElementById('contact-form');
+        const statusMessage = document.getElementById('form-status');
+        const sendButton = form.querySelector('button[type="submit"]');
+
+        function verificationUnavailable() {
+            statusMessage.textContent = 'Verification could not load. Allow hCaptcha in your browser and reload this page.';
+        }
+
+        if (form.elements.access_key.value.trim()) {
+            form.hidden = false;
+            const captchaScript = document.createElement('script');
+            captchaScript.src = 'https://js.hcaptcha.com/1/api.js?recaptchacompat=off';
+            captchaScript.onerror = verificationUnavailable;
+            document.head.append(captchaScript);
+        } else {
+            statusMessage.textContent = 'The contact form is temporarily unavailable. Please check back soon.';
+        }
+
+        form.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            if (form.hidden || sendButton.disabled) return;
+
+            const fields = new FormData(form);
+            if (!fields.get('h-captcha-response')) {
+                if (window.hcaptcha) {
+                    statusMessage.textContent = 'Please complete the verification checkbox before sending.';
+                } else {
+                    verificationUnavailable();
+                }
+                return;
+            }
+
+            sendButton.disabled = true;
+            statusMessage.textContent = 'Sending your message…';
+            try {
+                const response = await fetch(form.action, {
+                    method: 'POST',
+                    headers: { Accept: 'application/json' },
+                    body: fields
+                });
+                const result = await response.json();
+                if (response.ok && result.success === true) {
+                    form.reset();
+                    statusMessage.textContent = '';
+                    window.location.assign('thank-you.html');
+                    return;
+                }
+                statusMessage.textContent = response.status === 429
+                    ? 'Too many submissions. Please wait a few minutes before trying again.'
+                    : 'Your message was declined. Please complete verification again and retry.';
+            } catch {
+                statusMessage.textContent = 'Delivery could not be confirmed. Your message is still here. Please check your connection and try again.';
+            } finally {
+                sendButton.disabled = false;
+                window.hcaptcha?.reset();
+            }
+        });
+    </script>
 </body>
 </html>
